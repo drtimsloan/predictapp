@@ -1,0 +1,8 @@
+name: predictapp
+account: drtimsloan
+server: shinyapps.io
+bundleId: 406540
+url: https://drtimsloan.shinyapps.io/predictapp/
+when: 1459353086.57181
+asMultiple: FALSE
+asStatic: FALSE

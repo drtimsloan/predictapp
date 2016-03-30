@@ -25,7 +25,6 @@ options(stringsAsFactors = FALSE)
 # sixg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/sixg.txt")
 # ideag <- fread("/home/tim/Documents/RProjects/NLP/ngrams/ideagrams.txt")
 
-t1 <- Sys.time()
 load("data/unig.RData")
 load("data/stopg.RData")
 load("data/big.RData")
@@ -33,7 +32,7 @@ load("data/trig.RData")
 load("data/quadg.RData")
 load("data/fiveg.RData")
 load("data/sixg.RData")
-Sys.time() -t1
+load("data/ideag.RData")
 
 shinyServer(function(input, output) {
 
@@ -66,15 +65,15 @@ shinyServer(function(input, output) {
         in_five <- paste(c(rev(in_text)[5:1],""),collapse=" ")
         
         
-        in_idea <- ideag[(ideag$one %in% in_mean) &
-                             (ideag$two %in% in_mean) &
-                             (ideag$three %in% in_mean) &
-                             (!ideag$four %in% in_mean),]
-        
-        test <- ideag[((ideag$one %in% in_mean) | (ideag$two %in% in_mean)) &
-                          ((ideag$two %in% in_mean) | (ideag$three %in% in_mean)) &
-                          ((ideag$one %in% in_mean) | (ideag$three %in% in_mean)) &
-                          (!ideag$four %in% in_mean),]
+#         in_idea <- ideag[(ideag$one %in% in_mean) &
+#                              (ideag$two %in% in_mean) &
+#                              (ideag$three %in% in_mean) &
+#                              (!ideag$four %in% in_mean),]
+#         
+#         test <- ideag[((ideag$one %in% in_mean) | (ideag$two %in% in_mean)) &
+#                           ((ideag$two %in% in_mean) | (ideag$three %in% in_mean)) &
+#                           ((ideag$one %in% in_mean) | (ideag$three %in% in_mean)) &
+#                           (!ideag$four %in% in_mean),]
         
         out_big <- big[stri_startswith_fixed(big$ngram, in_uni)]
         out_trig <- trig[stri_startswith_fixed(trig$ngram, in_big)]
