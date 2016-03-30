@@ -16,14 +16,24 @@ options(stringsAsFactors = FALSE)
 
 # Load data
 
-unig <- readLines("/home/tim/Documents/RProjects/NLP/ngrams/unigrams.txt")
-stopg <- readLines("/home/tim/Documents/RProjects/NLP/ngrams/stopgrams.txt")
-big <- fread("/home/tim/Documents/RProjects/NLP/ngrams/bigrams.txt")
-trig <- fread("/home/tim/Documents/RProjects/NLP/ngrams/trig.txt")
-quadg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/quadg.txt")
-fiveg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/fiveg.txt")
-sixg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/sixg.txt")
-ideag <- fread("/home/tim/Documents/RProjects/NLP/ngrams/ideagrams.txt")
+# unig <- readLines("/home/tim/Documents/RProjects/NLP/ngrams/unigrams.txt")
+# stopg <- readLines("/home/tim/Documents/RProjects/NLP/ngrams/stopgrams.txt")
+# big <- fread("/home/tim/Documents/RProjects/NLP/ngrams/bigrams.txt")
+# trig <- fread("/home/tim/Documents/RProjects/NLP/ngrams/trig.txt")
+# quadg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/quadg.txt")
+# fiveg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/fiveg.txt")
+# sixg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/sixg.txt")
+# ideag <- fread("/home/tim/Documents/RProjects/NLP/ngrams/ideagrams.txt")
+
+t1 <- Sys.time()
+load("data/unig.RData")
+load("data/stopg.RData")
+load("data/big.RData")
+load("data/trig.RData")
+load("data/quadg.RData")
+load("data/fiveg.RData")
+load("data/sixg.RData")
+Sys.time() -t1
 
 shinyServer(function(input, output) {
 
