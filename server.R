@@ -6,8 +6,6 @@
 #
 
 library(shiny)
-library(dplyr)
-library(tidyr)
 library(quanteda)
 library(data.table)
 library(stringi)
@@ -16,27 +14,24 @@ options(stringsAsFactors = FALSE)
 
 # Load data
 
-# unig <- readLines("/home/tim/Documents/RProjects/NLP/ngrams/unigrams.txt")
-# stopg <- readLines("/home/tim/Documents/RProjects/NLP/ngrams/stopgrams.txt")
-# big <- fread("/home/tim/Documents/RProjects/NLP/ngrams/bigrams.txt")
-# trig <- fread("/home/tim/Documents/RProjects/NLP/ngrams/trig.txt")
-# quadg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/quadg.txt")
-# fiveg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/fiveg.txt")
-# sixg <- fread("/home/tim/Documents/RProjects/NLP/ngrams/sixg.txt")
-# ideag <- fread("/home/tim/Documents/RProjects/NLP/ngrams/ideagrams.txt")
+unig <- readLines("data/unigrams.txt")
+stopg <- readLines("data/stopgrams.txt")
+big <- fread("data/bigrams.txt")
+trig <- fread("data/trig.txt", nrow=1500000)
+quadg <- fread("data/quadg.txt", nrow=1500000)
+fiveg <- fread("data/fiveg.txt")
+sixg <- fread("data/sixg.txt")
 
-load("data/unig.RData")
-load("data/stopg.RData")
-load("data/big.RData")
-load("data/trig.RData")
-load("data/quadg.RData")
-load("data/fiveg.RData")
-load("data/sixg.RData")
-load("data/ideag.RData")
+setkey(big,ngram)
+setkey(trig,ngram)
+setkey(quadg,ngram)
+setkey(fiveg,ngram)
+setkey(sixg,ngram)
+
 
 shinyServer(function(input, output) {
 
-    datasetInput <- eventReactive(input$action, {input$inText})
+    datasetInput <- reactive({input$inText})
     
     output$outText <- renderText({
     
@@ -57,41 +52,23 @@ shinyServer(function(input, output) {
         in_size <- length(in_text)
         in_mean <- in_text[!in_text %in% stopg]
         
+        in_uni <- rev(in_text)[1]
+        in_big <- paste(rev(in_text)[2:1],collapse=" ")
+        in_trig <- paste(rev(in_text)[3:1],collapse=" ")
+        in_quad <- paste(rev(in_text)[4:1],collapse=" ")
+        in_five <- paste(rev(in_text)[5:1],collapse=" ")
         
-        in_uni <- paste(c(rev(in_text)[1],""),collapse=" ")
-        in_big <- paste(c(rev(in_text)[2:1],""),collapse=" ")
-        in_trig <- paste(c(rev(in_text)[3:1],""),collapse=" ")
-        in_quad <- paste(c(rev(in_text)[4:1],""),collapse=" ")
-        in_five <- paste(c(rev(in_text)[5:1],""),collapse=" ")
-        
-        
-#         in_idea <- ideag[(ideag$one %in% in_mean) &
-#                              (ideag$two %in% in_mean) &
-#                              (ideag$three %in% in_mean) &
-#                              (!ideag$four %in% in_mean),]
-#         
-#         test <- ideag[((ideag$one %in% in_mean) | (ideag$two %in% in_mean)) &
-#                           ((ideag$two %in% in_mean) | (ideag$three %in% in_mean)) &
-#                           ((ideag$one %in% in_mean) | (ideag$three %in% in_mean)) &
-#                           (!ideag$four %in% in_mean),]
-        
-        out_big <- big[stri_startswith_fixed(big$ngram, in_uni)]
-        out_trig <- trig[stri_startswith_fixed(trig$ngram, in_big)]
-        out_quad <- quadg[stri_startswith_fixed(quadg$ngram, in_trig)]
-        out_five <- fiveg[stri_startswith_fixed(fiveg$ngram, in_quad)]
-        out_six <- sixg[stri_startswith_fixed(sixg$ngram, in_five)]
-        
+        out_big <- big[in_uni]
+        out_trig <- trig[in_big,nomatch=0]
+        out_quad <- quadg[in_trig,nomatch=0]
+        out_five <- fiveg[in_quad,nomatch=0]
+        out_six <- sixg[in_five,nomatch=0]
         
         predictions <- rbind(out_six, out_five, out_quad, out_trig, out_big)
-        predictions$ngram <- sapply(predictions$ngram, function(x) {
-            temp <- unlist(strsplit(x, " "))
-            temp[length(temp)]})
-        predictions <- predictions[!predictions$ngram %in% c(stopg,"who"),]
-        # predictions <-  summarise(group_by(predictions, ngram), freq = sum(freq)) %>%
-        #                 arrange(desc(freq))
-        answer <- as.character(predictions[1,ngram])
+        predictions <- predictions[!predictions$pred %in% c(stopg,"who"),]
+        answer <- predictions[1,pred]
         
-        if(is.null(answer)){answer<-strsplit(out_big[1,ngram],split=" ")[[1]][2]}
+        if(is.null(answer)){answer<-out_big[1,pred]}
         
         output <- paste(in_raw, answer, sep=" ")
         output

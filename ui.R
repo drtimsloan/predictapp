@@ -17,7 +17,7 @@ shinyUI(fluidPage(
     sidebarPanel(
       textInput("inText",
                   "Enter your text here:"),
-      actionButton("action",label="Get prediction")
+      submitButton(text="Get prediction")
     ),
 
     # Show a plot of the generated distribution
