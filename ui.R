@@ -18,14 +18,16 @@ shinyUI(fluidPage(
     sidebarPanel(
       textInput("inText",
                   "Enter your text here:"),
-      submitButton(text="Get prediction"),
-      img(src='wizard.png')
+      submitButton(text="Get prediction"),br(),
+      img(src='wizard.png', width="350", align="center")
       
     ),
 
     # Main tabbed layout
     mainPanel(
+        
         tabsetPanel(
+            
             tabPanel("Predictions",
                      br(),
                      "Welcome to the Word Wizard text prediction interface!",
@@ -43,6 +45,7 @@ shinyUI(fluidPage(
                      textOutput("outText2"),
                      textOutput("outText3"),
                      textOutput("outText4")),
+            
             tabPanel("About", 
                     br(),
                     "This application was designed for the Coursera Data Science Specialisation Capstone",
