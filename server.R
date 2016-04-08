@@ -1,9 +1,9 @@
 
-# This is the server logic for a Shiny web application.
-# You can find out more about building applications with Shiny here:
+# Word Wizard Text Prediction App
 #
-# http://shiny.rstudio.com
+# https://drtimsloan.shinyapps.io/predictapp/
 #
+# Server code
 
 library(shiny)
 library(quanteda)
@@ -28,12 +28,14 @@ setkey(quadg,ngram)
 setkey(fiveg,ngram)
 setkey(sixg,ngram)
 
+predictions <- data.table(ngram="",pred="")
+
 shinyServer(function(input, output) {
 
     datasetInput <- reactive({input$inText})
     
     output$outText <- renderText({
-    
+        
         in_raw <- datasetInput()
         
         in_clean <- tokenize(toLower(corpus(in_raw)),
@@ -45,14 +47,16 @@ shinyServer(function(input, output) {
         
         final <- in_clean[length(in_clean)]
         
-        if(!final %in% unig){
-            correct <- unig[agrepl(final, unig,max.distance=0.2)][1]
-            if(is.na(correct)){correct <- unig[agrepl(final, unig,max.distance=0.5)][1]}
-            in_temp <- unlist(strsplit(in_raw, " "))
-            in_clean[length(in_clean)] <- correct
-            ifelse(length(in_temp)==1,in_raw <- correct,{
-                in_raw <- paste(c(in_temp[1:(length(in_temp)-1)],correct),collapse=" ")
-            })
+        if(length(final)!=0){
+            if(!final %in% unig){
+                correct <- unig[agrepl(final, unig,max.distance=0.2)][1]
+                if(is.na(correct)){correct <- unig[agrepl(final, unig,max.distance=0.5)][1]}
+                in_temp <- unlist(strsplit(in_raw, " "))
+                in_clean[length(in_clean)] <- correct
+                ifelse(length(in_temp)==1,in_raw <- correct,{
+                    in_raw <- paste(c(in_temp[1:(length(in_temp)-1)],correct),collapse=" ")
+                })
+            }
         }
         
         in_text <- in_clean[in_clean %in% unig]
@@ -79,11 +83,30 @@ shinyServer(function(input, output) {
         
         answer <- predictions[1,pred]
         
-        if(is.null(answer)){answer<-"the"}
-        if(is.na(answer)){answer<-"the"}
+        alt <- unique(predictions[1:8,pred])
         
-        output <- paste(in_raw, answer, sep=" ")
-        output
+        output$outText2 <- renderText({
+            first <- alt[2]
+            if(is.na(first)){first<-""}
+            first
+        })
+        
+        output$outText3 <- renderText({
+            second <- alt[3]
+            if(is.na(second)){second<-""}
+            second
+        })
+        
+        output$outText4 <- renderText({
+            third <- alt[4]
+            if(is.na(third)){third<-""}
+            third
+        })
+        
+        if(is.null(answer)){answer<-"the"}
+        outtext <- paste(in_raw, answer, sep=" ")
+        if(is.na(answer)){outtext<-"Ready for input"}
+        outtext
 
     })
 
